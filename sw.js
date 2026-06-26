@@ -1,4 +1,4 @@
-const CACHE = 'pi-quotes-v1';
+const CACHE = 'pi-quotes-v2';
 const ASSETS = [
   './',
   './index.html',
