@@ -463,6 +463,10 @@ body{
       <label>Sales Executive Name</label>
       <input type="text" id="s-execname">
     </div>
+    <div class="field">
+      <label>Sales Executive Mobile</label>
+      <input type="tel" id="s-execmob" maxlength="10">
+    </div>
     <div style="padding:4px 14px 12px;font-size:12px;color:var(--ink3);line-height:1.6;">
       Quote numbers: <strong>Q-ATH-240626-001</strong>. Set once, never change.
     </div>
@@ -594,10 +598,10 @@ body{
 // ═══════════════════════════════════
 let quotes   = JSON.parse(localStorage.getItem('pi_quotes')   || '[]');
 let settings = JSON.parse(localStorage.getItem('pi_settings') || JSON.stringify({
-  prefix:'', execname:'', validity:3,
+  prefix:'', execname:'', execmob:'', validity:3,
   expenseTypes:['Packing Charges','Delivery Charges'],
-  company:'PORTE INTERIO', addr:'City Complex, Kaaloor Road',
-  city:'Mankavu, Calicut - 673007', mob:'8848638372', gstin:'32ABCFP8879P1ZC',
+  company:'PORTE INTERIO', addr:'City Complex, Kaloor Road',
+  city:'Mankavu, Calicut - 673007', mob:'+91 8848638372', gstin:'32ABCFP8879P1ZC',
   acname:'PORTE INTERIO', bank:'HDFC BANK', acno:'50200077136222',
   ifsc:'HDFC0004179', branch:'CHALAPPURAM', upi:'vyapar.169221428040@hdfcbank'
 }));
@@ -714,6 +718,7 @@ function saveBankModal(){
 function loadSettingsUI(){
   document.getElementById('s-prefix').value   = settings.prefix   || '';
   document.getElementById('s-execname').value = settings.execname || '';
+  document.getElementById('s-execmob').value  = settings.execmob  || '';
   document.getElementById('s-validity').value = settings.validity || 3;
   // show exec name read-only in form
   document.getElementById('sales-exec').value = settings.execname || '';
@@ -736,6 +741,7 @@ function saveStaffSettings(){
   if(!raw){ showToast('⚠️ Staff Code required'); return; }
   settings.prefix   = raw;
   settings.execname = document.getElementById('s-execname').value.trim();
+  settings.execmob  = document.getElementById('s-execmob').value.trim();
   settings.validity = parseInt(document.getElementById('s-validity').value)||3;
   persistSettings(); loadSettingsUI();
   showToast('✅ Staff settings saved!');
@@ -931,6 +937,7 @@ function saveQuote(){
     custAddr2:document.getElementById('cust-addr2').value.trim().toUpperCase(),
     custGstin:gstin,
     salesExec:settings.execname||'',
+    salesExecMob:settings.execmob||'',
     date:today,
     validity:settings.validity||3,
     items:JSON.parse(JSON.stringify(items)),
@@ -1208,7 +1215,8 @@ async function buildPDF(q){
   doc.text('Quote No:',LX+2,y+5);
   doc.setFont('helvetica','normal');doc.setTextColor(...VTEXT);doc.text(q.id,LX+20,y+5);
   doc.setFont('helvetica','bold');doc.setTextColor(...GTEXT);doc.text('Sales Executive:',W/2,y+5);
-  doc.setFont('helvetica','normal');doc.setTextColor(...VTEXT);doc.text(q.salesExec||'',W/2+26,y+5);
+  const execDisplay = q.salesExec + (q.salesExecMob ? '  |  +91 '+q.salesExecMob : '');
+  doc.setFont('helvetica','normal');doc.setTextColor(...VTEXT);doc.text(execDisplay,W/2+26,y+5);
   y+=7;
 
   // Row 2: Date | Valid Until
